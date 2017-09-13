@@ -1,0 +1,33 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup Label="Configuration" Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <OutputType>Library</OutputType>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <ApplicationIcon />
+    <OutputTypeEx>exe</OutputTypeEx>
+    <StartupObject />
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <Authors>Michael Combs</Authors>
+    <Company />
+    <Description>Checks if an IP address is a public proxy or not using ProxyCheck.IO</Description>
+    <Copyright>Public Domain</Copyright>
+    <PackageLicenseUrl>https://github.com/hollow87/ProxyCheck/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/hollow87/ProxyCheck</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/hollow87/ProxyCheck</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageTags>proxy,proxycheck</PackageTags>
+    <NeutralLanguage />
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>false</DelaySign>
+    <AssemblyOriginatorKeyFile>proxycheck.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="10.0.3" />
+  </ItemGroup>
+
+</Project>
