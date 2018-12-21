@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.26403.0
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyCheck", "ProxyCheck\ProxyCheck.csproj", "{234ED760-6E95-4C53-B4EE-D4612A9E5BAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ProxyCheckUtil", "ProxyCheck\ProxyCheckUtil.csproj", "{234ED760-6E95-4C53-B4EE-D4612A9E5BAD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,5 +18,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {FAF9DCC6-FDB1-4F61-8F5C-6827C6EAA522}
 	EndGlobalSection
 EndGlobal
