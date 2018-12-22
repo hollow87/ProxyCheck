@@ -24,6 +24,10 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>proxycheck.snk</AssemblyOriginatorKeyFile>
+    <Version>2.0.0</Version>
+    <PackageId>ProxyCheck</PackageId>
+    <Product>ProxyCheck</Product>
+    <PackageReleaseNotes>Uses the v2 api on https://proxycheck.io</PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>
