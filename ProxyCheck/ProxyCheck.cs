@@ -28,141 +28,18 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Net;
 using System.Net.Http;
-using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+using JetBrains.Annotations;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
-using static ProxyCheckUtil.ProxyCheckResult;
 
 namespace ProxyCheckUtil
 {
-    public enum StatusResult
-    {
-        OK,
-        Warning,
-        Denied,
-        Error,
-    }
-
-    public class ProxyCheckResult
-    {
-        /// <summary>
-        /// API status result
-        /// </summary>
-        public StatusResult Status { get; set; }
-
-        /// <summary>
-        /// Answering node
-        /// </summary>
-        public string Node { get; set; }
-
-        /// <summary>
-        /// Dictionary of results for the IP address(es) provided
-        /// </summary>
-        public Dictionary<IPAddress, IpResult> Results { get; } = new Dictionary<IPAddress, IpResult>();
-     
-        /// <summary>
-        /// The amount of time the query took on the server
-        /// </summary>
-        public TimeSpan? QueryTime { get; set; }
-
-        public class IpResult
-        {
-            /// <summary>
-            /// The ASN the IP address belongs to
-            /// </summary>
-            public string ASN { get; set; }
-
-            /// <summary>
-            /// The provider the IP address belongs to
-            /// </summary>
-            public string Provider { get; set; }
-
-            /// <summary>
-            /// The country the IP address is in.
-            /// </summary>
-            public string Country { get; set; }
-
-            /// <summary>
-            /// The latitude of the IP address
-            /// </summary>
-            /// <remarks>
-            /// This is not the exact location of the IP address
-            /// </remarks>
-            public double? Latitude { get; set; }
-            /// <summary>
-            /// The longitude of the IP address
-            /// </summary>
-            /// <remarks>
-            /// This is not the exact location of the IP address
-            /// </remarks>
-            public double? Longitude { get; set; }
-            /// <summary>
-            /// The city the of the IP address
-            /// </summary>
-            /// <remarks>
-            /// This may not be the exact city
-            /// </remarks>
-            public string City { get; set; }
-
-            /// <summary>
-            /// ISO Country code of the IP address country
-            /// </summary>
-            public string ISOCode { get; set; }
-
-            /// <summary>
-            /// True if the IP is detected as proxy
-            /// False otherwise
-            /// </summary>
-            public bool IsProxy { get; set; }
-
-            /// <summary>
-            /// The type of proxy detected
-            /// </summary>
-            public string ProxyType { get; set; }
-
-            /// <summary>
-            /// The port the proxy server is operating on
-            /// </summary>
-            public int? Port { get; set; }
-
-            /// <summary>
-            /// The last time the proxy server was seen in human readable format.
-            /// </summary>
-            public string LastSeenHuman { get; set; }
-
-            /// <summary>
-            /// The last time the proxy server was seen in Unix time stamp
-            /// </summary>
-            public long? LastSeenUnix { get; set; }
-
-            /// <summary>
-            /// The last time the proxy server was seen
-            /// </summary>
-            public DateTimeOffset? LastSeen
-            {
-                get
-                {
-                    if (LastSeenUnix == null)
-                        return null;
-
-                    return DateTimeOffset.FromUnixTimeSeconds(LastSeenUnix.Value);
-                }
-
-            }
-
-            /// <summary>
-            /// If not `null` the description of the error that occured
-            /// </summary>
-            public string ErrorMessage { get; set; }
-        }
-    }
-
+    [PublicAPI]
     public class ProxyCheck
     {
         private const string PROXYCHECKURL = "proxycheck.io/v2";
@@ -177,31 +54,31 @@ namespace ProxyCheckUtil
         /// Including checking for VPN
         /// (Default: false)
         /// </summary>
-        public bool IncludeVPN { get; set; } = false;
+        public bool IncludeVPN { get; set; }
 
         /// <summary>
         /// Use HTTPS when checking IP address (slower)
         /// (Default: false)
         /// </summary>
-        public bool UseTLS { get; set; } = false;
+        public bool UseTLS { get; set; }
 
         /// <summary>
         /// Enables viewing the ASN of the network the IP address belongs to
         /// (Default: false)
         /// </summary>
-        public bool IncludeASN { get; set; } = false;
+        public bool IncludeASN { get; set; }
 
         /// <summary>
         /// Includes the answering node in the reply
         /// (Default: false)
         /// </summary>
-        public bool IncludeNode { get; set; } = false;
+        public bool IncludeNode { get; set; }
 
         /// <summary>
         /// Includes the time it took for query
         /// (Default: false)
         /// </summary>
-        public bool IncludeTime { get; set; } = false;
+        public bool IncludeTime { get; set; }
 
         /// <summary>
         /// Use the real-time inference engine
@@ -213,13 +90,13 @@ namespace ProxyCheckUtil
         /// Includes port number the IP was last seen operating a proxy server on
         /// (Default: false)
         /// </summary>
-        public bool IncludePort { get; set; } = false;
+        public bool IncludePort { get; set; }
 
         /// <summary>
         /// Includes the last time the IP address was seen acting as a proxy server
         /// (Default: false)
         /// </summary>
-        public bool IncludeLastSeen { get; set; } = false;
+        public bool IncludeLastSeen { get; set; }
 
         /// <summary>
         /// Restircts the proxy results between now and amount specifed days ago.
@@ -233,6 +110,7 @@ namespace ProxyCheckUtil
         /// </summary>
         /// <param name="ipAddress">The IP address to check</param>
         /// <param name="tag">Optional tag</param>
+        /// <exception cref="ProxyCheckException">An error has occured</exception>
         /// <returns>Object describing the result.</returns>
         public async Task<ProxyCheckResult> QueryAsync(string ipAddress, string tag = "")
         {
@@ -250,10 +128,11 @@ namespace ProxyCheckUtil
         /// </summary>
         /// <param name="ipAddress">The IP address to check</param>
         /// <param name="tag">Optional tag</param>
+        /// <exception cref="ProxyCheckException">An error has occured</exception>
         /// <returns>Object describing the result.</returns>
         public async Task<ProxyCheckResult> QueryAsync(IPAddress ipAddress, string tag = "")
         {
-            return await QueryAsync(new IPAddress[] {ipAddress}, tag);
+            return await QueryAsync(new[] {ipAddress}, tag);
         }
 
         /// <summary>
@@ -261,6 +140,7 @@ namespace ProxyCheckUtil
         /// </summary>
         /// <param name="ipAddresses">The IP addresses to check</param>
         /// <param name="tag">Optional tag</param>
+        /// <exception cref="ProxyCheckException">An error has occured</exception>
         /// <returns>Object describing the result.</returns>
         public async Task<ProxyCheckResult> QueryAsync(string[] ipAddresses, string tag = "")
         {
@@ -287,6 +167,7 @@ namespace ProxyCheckUtil
         /// </summary>
         /// <param name="ipAddresses">The IP addresses to check</param>
         /// <param name="tag">Optional tag</param>
+        /// <exception cref="ProxyCheckException">An error has occured</exception>
         /// <returns>Object describing the result.</returns>
         public async Task<ProxyCheckResult> QueryAsync(IPAddress[] ipAddresses, string tag = "")
         {
@@ -319,24 +200,34 @@ namespace ProxyCheckUtil
 
                 try
                 {
-                    HttpResponseMessage response = null;
-
-                    response = await client.PostAsync(url.ToString(), content);
+                    var response = await client.PostAsync(url.ToString(), content);
 
                     string json = await response.Content.ReadAsStringAsync();
 
                     return ParseJson(json);
 
                 }
+                catch (ArgumentNullException e)
+                {
+                    throw new ProxyCheckException("URL should not be NULL", e);
+                }
+                catch (JsonReaderException e)
+                {
+                    throw new ProxyCheckException("Bad JSON from server", e);
+                }
                 catch (Exception e)
                 {
-                    // Should do something here just rethrowing
-                    throw;
+                    throw new ProxyCheckException("Unknown state please check the inner exception.", e);
                 }
             }
 
         }
 
+        /// <summary>
+        /// Parses the servers JSON response
+        /// </summary>
+        /// <param name="json">JSON to Parse</param>
+        /// <returns>The parsed JSON</returns>
         private ProxyCheckResult ParseJson(string json)
         {
             ProxyCheckResult res = new ProxyCheckResult();
@@ -368,7 +259,7 @@ namespace ProxyCheckUtil
                     default:
                         if (IPAddress.TryParse(token.Key, out IPAddress ip))
                         {
-                            IpResult ipResult = new IpResult();
+                            ProxyCheckResult.IpResult ipResult = new ProxyCheckResult.IpResult();
 
                             foreach (var innerToken in (JObject) token.Value)
                             {
