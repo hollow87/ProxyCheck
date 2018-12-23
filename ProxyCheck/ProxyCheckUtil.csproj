@@ -27,7 +27,7 @@
     <Version>2.0.1</Version>
     <PackageId>ProxyCheck</PackageId>
     <Product>ProxyCheck</Product>
-    <PackageReleaseNotes>Uses the v2 api on https://proxycheck.io</PackageReleaseNotes>
+    <PackageReleaseNotes>Added support for caching.</PackageReleaseNotes>
     <AssemblyVersion>2.0.1.0</AssemblyVersion>
   </PropertyGroup>
 
