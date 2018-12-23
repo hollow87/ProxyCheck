@@ -42,31 +42,103 @@ namespace ProxyCheckUtil
     [PublicAPI]
     public class ProxyCheck
     {
+        /// <summary>
+        /// Creates the ProxyCheck object with optional API key and cache provider
+        /// </summary>
+        /// <param name="apiKey">API key to use</param>
+        /// <param name="cacheProvider">Cache provider to use</param>
+        public ProxyCheck(string apiKey = "", IProxyChceckCacheProvider cacheProvider = null)
+        {
+            if (apiKey == null)
+                apiKey = string.Empty;
+
+            ApiKey = apiKey;
+            CacheProvider = cacheProvider;
+        }
+
+        public ProxyCheck(IProxyChceckCacheProvider cacheProvider)
+        {
+            CacheProvider = cacheProvider;
+        }
+
         private const string PROXYCHECKURL = "proxycheck.io/v2";
+        
+        private ProxyCheckRequestOptions _options = new ProxyCheckRequestOptions();
+
+
+        public IProxyChceckCacheProvider CacheProvider { get; set; }
 
         /// <summary>
         /// The API key to use with the query
         /// (Default: String.Empty)
         /// </summary>
-        public string ApiKey { get; set; } = "";
+        public string ApiKey { get; set; }
+
+        #region Request options kept here for legacy reasons
 
         /// <summary>
         /// Including checking for VPN
         /// (Default: false)
         /// </summary>
-        public bool IncludeVPN { get; set; }
+        public bool IncludeVPN
+        {
+            get => _options.IncludeVPN;
+            set => _options.IncludeVPN = value;
+        }
 
         /// <summary>
         /// Use HTTPS when checking IP address (slower)
         /// (Default: false)
         /// </summary>
-        public bool UseTLS { get; set; }
+        public bool UseTLS
+        {
+            get => _options.UseTLS;
+            set => _options.UseTLS = value;
+        }
 
         /// <summary>
         /// Enables viewing the ASN of the network the IP address belongs to
         /// (Default: false)
         /// </summary>
-        public bool IncludeASN { get; set; }
+        public bool IncludeASN
+        {
+            get => _options.IncludeASN;
+            set => _options.IncludeASN = value;
+        }
+
+
+        /// <summary>
+        /// Use the real-time inference engine
+        /// (Default: true)
+        /// </summary>
+        public bool UseInference
+        {
+            get => _options.UseInference;
+            set => _options.UseInference = value;
+        }
+
+        /// <summary>
+        /// Includes port number the IP was last seen operating a proxy server on
+        /// (Default: false)
+        /// </summary>
+        public bool IncludePort
+        {
+            get => _options.IncludePort;
+            set => _options.IncludePort = value;
+        }
+
+        /// <summary>
+        /// Includes the last time the IP address was seen acting as a proxy server
+        /// (Default: false)
+        /// </summary>
+        public bool IncludeLastSeen
+        {
+            get => _options.IncludeLastSeen;
+            set => _options.IncludeLastSeen = value;
+        }
+
+
+        #endregion
 
         /// <summary>
         /// Includes the answering node in the reply
@@ -81,28 +153,12 @@ namespace ProxyCheckUtil
         public bool IncludeTime { get; set; }
 
         /// <summary>
-        /// Use the real-time inference engine
-        /// (Default: true)
-        /// </summary>
-        public bool UseInference { get; set; } = true;
-
-        /// <summary>
-        /// Includes port number the IP was last seen operating a proxy server on
-        /// (Default: false)
-        /// </summary>
-        public bool IncludePort { get; set; }
-
-        /// <summary>
-        /// Includes the last time the IP address was seen acting as a proxy server
-        /// (Default: false)
-        /// </summary>
-        public bool IncludeLastSeen { get; set; }
-
-        /// <summary>
         /// Restircts the proxy results between now and amount specifed days ago.
         /// (Default: 7)
         /// </summary>
         public int DayLimit { get; set; } = 7;
+
+
 
 
         /// <summary>
@@ -171,6 +227,52 @@ namespace ProxyCheckUtil
         /// <returns>Object describing the result.</returns>
         public async Task<ProxyCheckResult> QueryAsync(IPAddress[] ipAddresses, string tag = "")
         {
+            // We use this for if the cache is used and query is 100% cache hits
+            Stopwatch sw = new Stopwatch();
+            
+            if (!ipAddresses.Any())
+                throw new ArgumentException("Must contain at least 1 IP Address", nameof(ipAddresses));
+
+            IDictionary<IPAddress, ProxyCheckResult.IpResult> ipResults = null;
+            if (CacheProvider != null)
+            {
+                sw.Start();
+
+                ipResults = CacheProvider.GetCacheRecords(ipAddresses, _options);
+
+                // Ensure all the results are marked that they are cache hits
+
+                foreach (var item in ipResults)
+                    item.Value.IsCacheHit = true;
+
+                // We need to weed out the cache hits to pass the misses to the api
+                var ipList = ipAddresses.ToList();
+                ipList.RemoveAll(c => ipResults.ContainsKey(c));
+                ipAddresses = ipList.ToArray();
+
+                // Not 100% cache hits dont need stop watch anymore
+                if(ipAddresses.Any())
+                    sw.Stop();
+            }
+
+
+            if (ipAddresses.Length == 0 && ipResults != null) // All cache hits
+            {
+
+                ProxyCheckResult result = new ProxyCheckResult
+                {
+                    Results = new Dictionary<IPAddress, ProxyCheckResult.IpResult>(ipResults),
+                    Status = StatusResult.OK,
+                    Node = IncludeNode ? "CACHE" : null
+                };
+
+                // 100% cache hits let's stop now
+                sw.Stop();
+                result.QueryTime = sw.Elapsed;
+
+                return result;
+            }
+
             var url = new StringBuilder()
                 .Append($"{(UseTLS ? "https://" : "http://")}{PROXYCHECKURL}/")
                 .Append(!string.IsNullOrWhiteSpace(ApiKey) ? $"&key={ApiKey}" : "")
@@ -187,9 +289,6 @@ namespace ProxyCheckUtil
             {
                 Dictionary<string, string> postData = new Dictionary<string, string>();
 
-                if (!ipAddresses.Any())
-                    throw new ArgumentException("Must contain at least 1 IP Address", nameof(ipAddresses));
-
                 string ipList = string.Join(",", ipAddresses.Select(c => c.ToString()));
                 postData.Add("ips", ipList);
 
@@ -204,7 +303,23 @@ namespace ProxyCheckUtil
 
                     string json = await response.Content.ReadAsStringAsync();
 
-                    return ParseJson(json);
+                    ProxyCheckResult result = ParseJson(json);
+
+                    // We want to update the cache now
+                    CacheProvider?.SetCacheRecord(result.Results, _options);
+
+                    if (ipResults == null || !ipResults.Any()) // Return current results as none were cache hits
+                        return result;
+
+                    foreach (var item in ipResults)
+                    {
+                        if(result.Results.ContainsKey(item.Key))
+                            continue; // We don't want to include a cache hit from an IP that was somehow gotten from API too.
+
+                        result.Results.Add(item.Key, item.Value);
+                    }
+
+                    return result;
 
                 }
                 catch (ArgumentNullException e)

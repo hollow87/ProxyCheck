@@ -48,7 +48,7 @@ namespace ProxyCheckUtil
         /// <summary>
         /// Dictionary of results for the IP address(es) provided
         /// </summary>
-        public Dictionary<IPAddress, IpResult> Results { get; } = new Dictionary<IPAddress, IpResult>();
+        public Dictionary<IPAddress, IpResult> Results { get; internal set; } = new Dictionary<IPAddress, IpResult>();
 
         /// <summary>
         /// The amount of time the query took on the server
@@ -129,7 +129,6 @@ namespace ProxyCheckUtil
             /// <summary>
             /// The last time the proxy server was seen
             /// </summary>
-            [PublicAPI]
             public DateTimeOffset? LastSeen
             {
                 get
@@ -146,6 +145,11 @@ namespace ProxyCheckUtil
             /// If not `null` the description of the error that occured
             /// </summary>
             public string ErrorMessage { get; set; }
+
+            /// <summary>
+            /// True if this item was retrieved from cache
+            /// </summary>
+            public bool IsCacheHit { get; set; }
         }
     }
 }
