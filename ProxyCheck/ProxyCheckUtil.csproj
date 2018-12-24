@@ -24,11 +24,16 @@
     <SignAssembly>true</SignAssembly>
     <DelaySign>false</DelaySign>
     <AssemblyOriginatorKeyFile>proxycheck.snk</AssemblyOriginatorKeyFile>
-    <Version>2.0.1</Version>
+    <Version>2.0.1.1</Version>
     <PackageId>ProxyCheck</PackageId>
     <Product>ProxyCheck</Product>
-    <PackageReleaseNotes>Added support for caching.</PackageReleaseNotes>
+    <PackageReleaseNotes>Updated nuget package to include the XML documentation.</PackageReleaseNotes>
     <AssemblyVersion>2.0.1.0</AssemblyVersion>
+    <FileVersion>2.0.1.0</FileVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>C:\Users\Mikey\Source\Repos\ProxyCheck\ProxyCheck\ProxyCheckUtil.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>

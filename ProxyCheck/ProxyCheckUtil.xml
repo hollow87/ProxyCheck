@@ -1,0 +1,259 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>ProxyCheckUtil</name>
+    </assembly>
+    <members>
+        <member name="M:ProxyCheckUtil.ProxyCheck.#ctor(System.String,ProxyCheckUtil.IProxyChceckCacheProvider)">
+            <summary>
+            Creates the ProxyCheck object with optional API key and cache provider
+            </summary>
+            <param name="apiKey">API key to use</param>
+            <param name="cacheProvider">Cache provider to use</param>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.ApiKey">
+            <summary>
+            The API key to use with the query
+            (Default: String.Empty)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludeVPN">
+            <summary>
+            Including checking for VPN
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.UseTLS">
+            <summary>
+            Use HTTPS when checking IP address (slower)
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludeASN">
+            <summary>
+            Enables viewing the ASN of the network the IP address belongs to
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.UseInference">
+            <summary>
+            Use the real-time inference engine
+            (Default: true)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludePort">
+            <summary>
+            Includes port number the IP was last seen operating a proxy server on
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludeLastSeen">
+            <summary>
+            Includes the last time the IP address was seen acting as a proxy server
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludeNode">
+            <summary>
+            Includes the answering node in the reply
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.IncludeTime">
+            <summary>
+            Includes the time it took for query
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheck.DayLimit">
+            <summary>
+            Restircts the proxy results between now and amount specifed days ago.
+            (Default: 7)
+            </summary>
+        </member>
+        <member name="M:ProxyCheckUtil.ProxyCheck.QueryAsync(System.String,System.String)">
+            <summary>
+            Checks to see if the given IP address is a proxy
+            </summary>
+            <param name="ipAddress">The IP address to check</param>
+            <param name="tag">Optional tag</param>
+            <exception cref="T:ProxyCheckUtil.ProxyCheckException">An error has occured</exception>
+            <returns>Object describing the result.</returns>
+        </member>
+        <member name="M:ProxyCheckUtil.ProxyCheck.QueryAsync(System.Net.IPAddress,System.String)">
+            <summary>
+            Checks to see if the given IP address is a proxy
+            </summary>
+            <param name="ipAddress">The IP address to check</param>
+            <param name="tag">Optional tag</param>
+            <exception cref="T:ProxyCheckUtil.ProxyCheckException">An error has occured</exception>
+            <returns>Object describing the result.</returns>
+        </member>
+        <member name="M:ProxyCheckUtil.ProxyCheck.QueryAsync(System.String[],System.String)">
+            <summary>
+            Checks to see if the given IP address is a proxy
+            </summary>
+            <param name="ipAddresses">The IP addresses to check</param>
+            <param name="tag">Optional tag</param>
+            <exception cref="T:ProxyCheckUtil.ProxyCheckException">An error has occured</exception>
+            <returns>Object describing the result.</returns>
+        </member>
+        <member name="M:ProxyCheckUtil.ProxyCheck.QueryAsync(System.Net.IPAddress[],System.String)">
+            <summary>
+            Checks to see if the given IP address is a proxy
+            </summary>
+            <param name="ipAddresses">The IP addresses to check</param>
+            <param name="tag">Optional tag</param>
+            <exception cref="T:ProxyCheckUtil.ProxyCheckException">An error has occured</exception>
+            <returns>Object describing the result.</returns>
+        </member>
+        <member name="M:ProxyCheckUtil.ProxyCheck.ParseJson(System.String)">
+            <summary>
+            Parses the servers JSON response
+            </summary>
+            <param name="json">JSON to Parse</param>
+            <returns>The parsed JSON</returns>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.IncludeVPN">
+            <summary>
+            Including checking for VPN
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.UseTLS">
+            <summary>
+            Use HTTPS when checking IP address (slower)
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.IncludeASN">
+            <summary>
+            Enables viewing the ASN of the network the IP address belongs to
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.UseInference">
+            <summary>
+            Use the real-time inference engine
+            (Default: true)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.IncludePort">
+            <summary>
+            Includes port number the IP was last seen operating a proxy server on
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckRequestOptions.IncludeLastSeen">
+            <summary>
+            Includes the last time the IP address was seen acting as a proxy server
+            (Default: false)
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.Status">
+            <summary>
+            API status result
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.Node">
+            <summary>
+            Answering node
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.Results">
+            <summary>
+            Dictionary of results for the IP address(es) provided
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.QueryTime">
+            <summary>
+            The amount of time the query took on the server
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.ASN">
+            <summary>
+            The ASN the IP address belongs to
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.Provider">
+            <summary>
+            The provider the IP address belongs to
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.Country">
+            <summary>
+            The country the IP address is in.
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.Latitude">
+            <summary>
+            The latitude of the IP address
+            </summary>
+            <remarks>
+            This is not the exact location of the IP address
+            </remarks>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.Longitude">
+            <summary>
+            The longitude of the IP address
+            </summary>
+            <remarks>
+            This is not the exact location of the IP address
+            </remarks>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.City">
+            <summary>
+            The city the of the IP address
+            </summary>
+            <remarks>
+            This may not be the exact city
+            </remarks>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.ISOCode">
+            <summary>
+            ISO Country code of the IP address country
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.IsProxy">
+            <summary>
+            True if the IP is detected as proxy
+            False otherwise
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.ProxyType">
+            <summary>
+            The type of proxy detected
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.Port">
+            <summary>
+            The port the proxy server is operating on
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.LastSeenHuman">
+            <summary>
+            The last time the proxy server was seen in human readable format.
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.LastSeenUnix">
+            <summary>
+            The last time the proxy server was seen in Unix time stamp
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.LastSeen">
+            <summary>
+            The last time the proxy server was seen
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.ErrorMessage">
+            <summary>
+            If not `null` the description of the error that occured
+            </summary>
+        </member>
+        <member name="P:ProxyCheckUtil.ProxyCheckResult.IpResult.IsCacheHit">
+            <summary>
+            True if this item was retrieved from cache
+            </summary>
+        </member>
+    </members>
+</doc>
