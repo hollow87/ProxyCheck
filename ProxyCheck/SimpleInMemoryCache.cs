@@ -5,7 +5,7 @@ using System.Net;
 
 namespace ProxyCheckUtil
 {
-    public class SimpleInMemoryCache : IProxyChceckCacheProvider
+    public class SimpleInMemoryCache : IProxyCheckCacheProvider
     {
         private List<CacheItem> _cacheItems = new List<CacheItem>();
         private TimeSpan _maxCacheAge = TimeSpan.FromHours(1);

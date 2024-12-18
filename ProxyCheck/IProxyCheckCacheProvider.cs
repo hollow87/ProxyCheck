@@ -3,7 +3,7 @@ using System.Net;
 
 namespace ProxyCheckUtil
 {
-    public interface IProxyChceckCacheProvider
+    public interface IProxyCheckCacheProvider
     {
         ProxyCheckResult.IpResult GetCacheRecord(IPAddress ip, ProxyCheckRequestOptions options);
 

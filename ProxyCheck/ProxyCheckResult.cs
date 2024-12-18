@@ -117,6 +117,11 @@ namespace ProxyCheckUtil
             public int? Port { get; set; }
 
             /// <summary>
+            /// Not null when risk is > 0, the risk score of the IP address
+            /// </summary>
+            public int? RiskScore { get; set; }
+            
+            /// <summary>
             /// The last time the proxy server was seen in human readable format.
             /// </summary>
             public string LastSeenHuman { get; set; }

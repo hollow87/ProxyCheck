@@ -41,6 +41,13 @@ namespace ProxyCheckUtil
         /// </summary>
         public bool IncludeLastSeen { get; set; }
 
+        /// <summary>
+        /// Determines whether you will receive a risk score with the result. If enabled, a risk score will be included
+        /// with your response.<br/>
+        /// (Default: <see cref="RiskLevel.Disabled"/>) 
+        /// </summary>
+        public RiskLevel? RiskLevel { get; set; }
+
         public override bool Equals(object obj)
         {
             if (!(obj is ProxyCheckRequestOptions o))
@@ -59,6 +66,9 @@ namespace ProxyCheckUtil
                 return false;
 
             if (IncludePort != o.IncludePort)
+                return false;
+
+            if (RiskLevel != o.RiskLevel)
                 return false;
 
             return IncludeLastSeen == o.IncludeLastSeen;

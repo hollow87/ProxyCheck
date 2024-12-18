@@ -47,7 +47,7 @@ namespace ProxyCheckUtil
         /// </summary>
         /// <param name="apiKey">API key to use</param>
         /// <param name="cacheProvider">Cache provider to use</param>
-        public ProxyCheck(string apiKey = "", IProxyChceckCacheProvider cacheProvider = null)
+        public ProxyCheck(string apiKey = "", IProxyCheckCacheProvider cacheProvider = null)
         {
             if (apiKey == null)
                 apiKey = string.Empty;
@@ -56,17 +56,16 @@ namespace ProxyCheckUtil
             CacheProvider = cacheProvider;
         }
 
-        public ProxyCheck(IProxyChceckCacheProvider cacheProvider)
+        public ProxyCheck(IProxyCheckCacheProvider cacheProvider)
         {
             CacheProvider = cacheProvider;
         }
 
-        private const string PROXYCHECKURL = "proxycheck.io/v2";
+        private const string ProxyCheckUrl = "proxycheck.io/v2";
         
         private ProxyCheckRequestOptions _options = new ProxyCheckRequestOptions();
-
-
-        public IProxyChceckCacheProvider CacheProvider { get; set; }
+        
+        public IProxyCheckCacheProvider CacheProvider { get; set; }
 
         /// <summary>
         /// The API key to use with the query
@@ -158,7 +157,16 @@ namespace ProxyCheckUtil
         /// </summary>
         public int DayLimit { get; set; } = 7;
 
-
+        /// <summary>
+        /// Determines whether you will receive a risk score with the result. If enabled, a risk score will be included
+        /// with your response.<br/>
+        /// (Default: <see cref="RiskLevel.Disabled"/>) 
+        /// </summary>
+        public RiskLevel RiskLevel
+        {
+            get => _options.RiskLevel ?? RiskLevel.Disabled;
+            set => _options.RiskLevel = value;
+        }
 
 
         /// <summary>
@@ -274,7 +282,7 @@ namespace ProxyCheckUtil
             }
 
             var url = new StringBuilder()
-                .Append($"{(UseTLS ? "https://" : "http://")}{PROXYCHECKURL}/")
+                .Append($"{(UseTLS ? "https://" : "http://")}{ProxyCheckUrl}/")
                 .Append(!string.IsNullOrWhiteSpace(ApiKey) ? $"&key={ApiKey}" : "")
                 .Append($"&vpn={Convert.ToInt32(IncludeVPN)}")
                 .Append($"&asn={Convert.ToInt32(IncludeASN)}")
@@ -283,7 +291,8 @@ namespace ProxyCheckUtil
                 .Append($"&inf={Convert.ToInt32(UseInference)}")
                 .Append($"&port={Convert.ToInt32(IncludePort)}")
                 .Append($"&seen={Convert.ToInt32(IncludeLastSeen)}")
-                .Append($"&days={Convert.ToInt32(DayLimit)}");
+                .Append($"&days={Convert.ToInt32(DayLimit)}")
+                .Append($"&risk={Convert.ToInt32(RiskLevel)}");
 
             using (var client = new HttpClient())
             {
@@ -412,7 +421,11 @@ namespace ProxyCheckUtil
                                         string isProxy = (string) innerToken.Value;
                                         ipResult.IsProxy = isProxy.Equals("yes", StringComparison.OrdinalIgnoreCase);
                                         break;
-
+                                    
+                                    case "risk":
+                                        ipResult.RiskScore = Convert.ToInt32((string)innerToken.Value);
+                                        break;
+                                    
                                     case "type":
                                         ipResult.ProxyType = (string)innerToken.Value;
                                         break;
